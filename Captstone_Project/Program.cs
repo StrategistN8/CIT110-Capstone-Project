@@ -7,7 +7,8 @@ using FinchAPI;
 using System.IO;
 
 
-namespace Capstone_Project
+
+namespace Captstone_Project
 {
     //**************************************************************************************
     // Application Name: DARTH FINCH
@@ -68,7 +69,7 @@ namespace Capstone_Project
             Console.Clear();
             DisplayHeader("DARTH FINCH");
             Console.WriteLine();
-            Console.WriteLine("Please enter your name to begin:");
+            Console.WriteLine("Please enter player name:");
             Console.Write("-> ");
             userName = Console.ReadLine();
 
@@ -77,7 +78,7 @@ namespace Capstone_Project
             Console.Clear();
             DisplayHeader("DARTH FINCH");
             Console.WriteLine();
-            Console.WriteLine("{0}.", userName);
+            Console.WriteLine("{0}, welcome!", userName);
 
 
             DisplayContinuePrompt();
@@ -121,7 +122,7 @@ namespace Capstone_Project
         }
       
         /// <summary>
-        /// MenuSwitchBoard: Processes menu selection and controls application flow.
+        /// Processes menu selection for DisplayMainMenu.
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="menuChoice"></param>
@@ -158,6 +159,92 @@ namespace Capstone_Project
             return runApp;
         }
 
+        /// <summary>
+        /// Gets the desired difficulty from the user.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        static Difficulty GetDifficultySetting()
+        {
+            // Local Variables:
+            Difficulty difficulty;
+
+                foreach (var setting in Enum.GetValues(typeof(Difficulty)))
+                {
+                    Console.WriteLine(setting);
+                }
+
+                Console.WriteLine("Select Difficulty -> ");
+                while (!Enum.TryParse(Console.ReadLine(), out difficulty))
+                {
+                    Console.WriteLine("That is not a valid difficulty level. Please try again!");
+                    DisplayContinuePrompt();
+                }
+                                      
+            return difficulty;
+
+        }
+        
+        /// <summary>
+        /// Setup menu: Allows the user to access Finch connection and difficulty settings.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="darthFinch"></param>
+        /// <param name="darthFinchOperator"></param>
+        static void DisplaySetupMenu(string userName, Finch darthFinch, FinchOperator darthFinchOperator)
+        {
+            // Local Variables:
+            string menuChoice;
+            
+            DisplayHeader("SET UP");
+
+            //Display Menu:
+            DisplaySpacer();
+            Console.WriteLine("\t1.) [Connect to Finch Robot]");
+            Console.WriteLine("\t2.) [Select Difficulty]");
+            Console.WriteLine("\t3.) [Change Player Name]");
+      
+            Console.WriteLine("\tM) Return to Main Menu");
+            DisplaySpacer();
+            Console.Write("\tInput -> ");
+            menuChoice = Console.ReadLine();
+
+            // Processes menu selection: 
+            SettingsSwitchBoard(menuChoice, darthFinch, darthFinchOperator);
+        }
+
+        /// <summary>
+        /// Processes menu selection for DisplaySetupMenu
+        /// </summary>
+        /// <param name="menuChoice"></param>
+        /// <param name="darthFinch"></param>
+        /// <param name="darthFinchOperator"></param>
+        static void SettingsSwitchBoard(string menuChoice, Finch darthFinch, FinchOperator darthFinchOperator)
+        {
+            // local variables: 
+            Difficulty difficulty;
+
+            switch (menuChoice.ToUpper())
+            {
+                case "1":
+                    FinchOperator.EstablishFinchConnection(darthFinch); 
+                    break;
+                case "2":
+                   difficulty = GetDifficultySetting();
+                    DifficultySettings(difficulty, darthFinchOperator);
+                    break;
+                case "3":
+                    DisplayWelcomeScreen();
+                    break;
+                case "M":
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+        
         /// <summary>
         /// Information Screen: Tells the user how to play and what materials they need.
         /// </summary>
@@ -197,9 +284,10 @@ namespace Capstone_Project
 
             darthFinch.disConnect();
         }
-
-
-
+                
+        /// <summary>
+        /// Reads the high scores list from the file.
+        /// </summary>
         static void DisplayReadScoreFromFile()
         {
             // Local Variables:
@@ -229,15 +317,14 @@ namespace Capstone_Project
                 Console.WriteLine("Unable to retrieve data. No data was found.");
                 Console.WriteLine();
             }
-            return temperatures;
+            
         }
 
         #endregion
 
         #region GAMEPLAY ELEMENTS
 
-
-
+        
         /// <summary>
         /// Takes the difficulty selected by the player and assigns values for use in other Finch operations based on that difficulty.
         /// </summary>

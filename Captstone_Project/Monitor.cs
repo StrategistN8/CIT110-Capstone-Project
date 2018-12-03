@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FinchAPI;
 
-namespace Capstone_Project
+namespace Captstone_Project
 {
     /// <summary>
     /// Class of functions which collect and store data for main application.

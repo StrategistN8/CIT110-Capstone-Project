@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FinchAPI;
 
-namespace Capstone_Project
+namespace Captstone_Project
 {
     
     /// <summary>
@@ -86,7 +86,7 @@ namespace Capstone_Project
         /// Connects to the Finch:
         /// </summary>
         /// <param name="myFinch"></param>
-        static void EstablishFinchConnection(Finch myFinch)
+        public static void EstablishFinchConnection(Finch myFinch)
         {
             //Variables: 
 
@@ -120,7 +120,7 @@ namespace Capstone_Project
         /// <param name="difficulty"></param>
         /// <param name="difficultySettings"></param>
         /// <param name="isDefeated"></param>
-        static void MotorSettings(Finch myFinch, Difficulty difficulty, FinchOperator difficultySettings, bool isDefeated)
+       public static void MotorSettings(Finch myFinch, Difficulty difficulty, FinchOperator difficultySettings, bool isDefeated)
         {
             switch (difficulty)
             {
@@ -168,7 +168,7 @@ namespace Capstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <param name="isVulnerable"></param>
-        static void LEDSettings(Finch myFinch, bool isVulnerable)
+        public static void LEDSettings(Finch myFinch, bool isVulnerable)
         {
             if (isVulnerable)
             {
@@ -185,7 +185,7 @@ namespace Capstone_Project
         /// Plays the Imperial March on the finch. WARNING: VERY LONG CODE BLOCK - CLOSE WHEN NOT IN USE
         /// </summary>
         /// <param name="myFinch"></param>
-        static void PlayImpMarch(Finch myFinch)
+        public static void PlayImpMarch(Finch myFinch)
         {
             // Source for notes: http://llrprt.blogspot.com/2013/11/programming-imperial-march.htmlhttp://llrprt.blogspot.com/2013/11/programming-imperial-march.html
 
@@ -513,7 +513,7 @@ namespace Capstone_Project
         /// Plays the first few notes of Imperial March on the Finch. WARNING: LONG CODE BLOCK
         /// </summary>
         /// <param name="myFinch"></param>
-        static void PlayImpMarchShort(Finch myFinch)
+        public static void PlayImpMarchShort(Finch myFinch)
         {
             // Source for notes: http://llrprt.blogspot.com/2013/11/programming-imperial-march.htmlhttp://llrprt.blogspot.com/2013/11/programming-imperial-march.html
 
