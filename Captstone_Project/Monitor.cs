@@ -58,7 +58,7 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <returns></returns>
-        static bool HitDetection(Finch myFinch)
+      public static bool HitDetection(Finch myFinch)
         {
             // Local Variables: 
             double ambientLight = GetLightAverage(myFinch);
@@ -90,7 +90,7 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <returns></returns>
-       static int GetLightAverage(Finch myFinch)
+      public static int GetLightAverage(Finch myFinch)
         {
             // Variables: 
             int leftSensor = myFinch.getLeftLightSensor();
@@ -105,11 +105,11 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <returns>isHit</returns>
-       static bool FreezeDetection(Finch myFinch)
+      public static bool FreezeDetection(Finch myFinch)
         {
             // Variable: 
             double ambientTemperature = myFinch.getTemperature();
-            const double threshold = 1.5;
+            const double threshold = 0.5;
 
             double minTemperatureThreshold = ambientTemperature - threshold;
             double currentTemperature = myFinch.getTemperature();

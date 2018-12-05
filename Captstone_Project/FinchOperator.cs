@@ -7,7 +7,7 @@ using FinchAPI;
 
 namespace Captstone_Project
 {
-    
+
     /// <summary>
     /// Class of Finch operational functions: Controls various Finch settings and operations.
     /// </summary>
@@ -22,7 +22,10 @@ namespace Captstone_Project
         private int hitPoints;
         private int _hitsSuffered;
         private int _scoreModifier;
-             
+        private Difficulty _difficultySetting;
+
+    
+
         #endregion
 
         #region PROPERTIES:
@@ -73,6 +76,13 @@ namespace Captstone_Project
             get { return _scoreModifier; }
             set { _scoreModifier = value; }
         }
+
+        public Difficulty DifficultySetting
+        {
+            get { return _difficultySetting; }
+            set { _difficultySetting = value; }
+        }
+
         #endregion
 
         #region CONSTRUCTORS:
@@ -93,73 +103,63 @@ namespace Captstone_Project
             Console.WriteLine("Please plug your finch into the computer. Then, press any key to continue.");
             Console.ReadKey();
 
-            while (!myFinch.connect())
-            {
-                myFinch.connect();
-                Console.WriteLine("Attempting to connect:");
-                DisplayContinuePrompt();
-
-                if (!myFinch.connect())
-                {
-                    Console.WriteLine("Unable to connect to the finch. Please check your cable connection and try again!");
-                    DisplayContinuePrompt();
-                }
-
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("You are now connected!");
+            myFinch.connect();
             DisplayContinuePrompt();
-            Console.Clear();
+
+            if (!myFinch.connect())
+            {
+                Console.WriteLine("Unable to connect to the finch. Please check your cable connection and try again!");
+                DisplayContinuePrompt();
+            }
+            
+            if (myFinch.connect())
+            {
+                Console.WriteLine();
+                Console.WriteLine("You are now connected!");
+                DisplayContinuePrompt();
+                Console.Clear();
+            }
         }
-              
+
         /// <summary>
         /// Sets motor behavior for the Finch.
         /// </summary>
         /// <param name="myFinch"></param>
         /// <param name="difficulty"></param>
-        /// <param name="difficultySettings"></param>
+        /// <param name="myFinchOperator"></param>
         /// <param name="isDefeated"></param>
-       public static void MotorSettings(Finch myFinch, Difficulty difficulty, FinchOperator difficultySettings, bool isDefeated)
+        public static void MotorSettings(Finch myFinch, FinchOperator myFinchOperator)
         {
-            switch (difficulty)
+            switch (myFinchOperator.DifficultySetting)
             {
                 case Difficulty.MERCIFUL:
-                    while (!isDefeated)
-                    {
-                        myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed);
-                        myFinch.wait(4000);
-                        myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed * -1);
-                        myFinch.wait(1000);
-                    }
+
+                    myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed);
+                    myFinch.wait(4000);
+                    myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed * -1);
+                    myFinch.wait(1000);
                     break;
                 case Difficulty.NORMAL:
-                    while (!isDefeated)
-                    {
-                        myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed);
-                        myFinch.wait(1000);
-                        myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed * -1);
-                        myFinch.wait(500);
 
-                    }
+                    myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed);
+                    myFinch.wait(1000);
+                    myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed * -1);
+                    myFinch.wait(500);
+
                     break;
                 case Difficulty.RUTHLESS:
                     Random ruthless = new Random();
-                    while (!isDefeated)
-                    {
-                        myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed);
-                        myFinch.wait(ruthless.Next()*100);
-                        myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed * -1);
-                        myFinch.wait(ruthless.Next()*100);
-                                              
-                    }
+                    myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed);
+                    myFinch.wait(ruthless.Next() * 100);
+                    myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed * -1);
+                    myFinch.wait(ruthless.Next() * 100);
                     break;
                 default:
                     myFinch.setMotors(0, 0);
                     break;
             }
 
-            myFinch.setMotors(difficultySettings.MotorSpeed, difficultySettings.MotorSpeed);
+            myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed);
 
         }
 
@@ -168,9 +168,9 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <param name="isVulnerable"></param>
-        public static void LEDSettings(Finch myFinch, bool isVulnerable)
+        public static void LEDSettings(Finch myFinch, FinchOperator myFinchOperator)
         {
-            if (isVulnerable)
+            if (myFinchOperator.IsVulnerable == true)
             {
                 myFinch.setLED(0, 0, 0);
             }
@@ -194,319 +194,319 @@ namespace Captstone_Project
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-            
+
             myFinch.noteOn(440);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-            
+
             myFinch.noteOn(440);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(349);
             myFinch.wait(350);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(523);
             myFinch.wait(150);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(440);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(349);
             myFinch.wait(350);
             myFinch.noteOff();
             myFinch.wait(10);
-                                 
+
             myFinch.noteOn(523);
             myFinch.wait(150);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(440);
             myFinch.wait(1000);
             myFinch.noteOff();
             myFinch.wait(10);
-                                 
+
             myFinch.noteOn(659);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
-            myFinch.noteOn(659);
-            myFinch.wait(500);
-            myFinch.noteOff();    
-            myFinch.wait(10);
-            
+
             myFinch.noteOn(659);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                               
+
+            myFinch.noteOn(659);
+            myFinch.wait(500);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
             myFinch.noteOn(698);
             myFinch.wait(350);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(523);
             myFinch.wait(150);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(415);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(349);
             myFinch.wait(350);
             myFinch.noteOff();
             myFinch.wait(10);
-                               
+
             myFinch.noteOn(523);
             myFinch.wait(150);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(440);
             myFinch.wait(1000);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(800);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(440);
             myFinch.wait(350);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(440);
             myFinch.wait(150);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(880);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(830);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                 
+
             myFinch.noteOn(784);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(740);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(698);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(740);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(250);
-                                  
+
             myFinch.noteOn(455);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(622);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(587);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                        
+
             myFinch.noteOn(554);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(523);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(466);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(523);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(250);
-                                   
+
             myFinch.noteOn(349);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(415);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                 
+
             myFinch.noteOn(349);
             myFinch.wait(375);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(440);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(523);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(440);
             myFinch.wait(375);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(523);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(659);
             myFinch.wait(1000);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(880);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(440);
             myFinch.wait(350);
             myFinch.noteOff();
             myFinch.wait(10);
-                                 
+
             myFinch.noteOn(440);
             myFinch.wait(150);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(880);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(830);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                       
+
             myFinch.noteOn(784);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(740);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(698);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                 
+
             myFinch.noteOn(740);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(250);
-                                   
+
             myFinch.noteOn(455);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(622);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(587);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(554);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(523);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(466);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
 
 
-           
+
             myFinch.noteOn(523);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(250);
-                                   
+
             myFinch.noteOn(349);
             myFinch.wait(250);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(415);
             myFinch.wait(500);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(349);
             myFinch.wait(375);
             myFinch.noteOff();
             myFinch.wait(10);
-                                   
+
             myFinch.noteOn(261);
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
-                                  
+
             myFinch.noteOn(475);
             myFinch.wait(1000);
             myFinch.noteOff();
             myFinch.wait(100);
-            
+
         }
 
         /// <summary>
