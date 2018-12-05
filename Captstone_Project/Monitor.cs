@@ -62,7 +62,7 @@ namespace Captstone_Project
         {
             // Local Variables: 
             double ambientLight = GetLightAverage(myFinch);
-            double threshold = 10;
+            double threshold = 1;
             double maxLightThreshold = ambientLight + threshold;
             int currentLight = GetLightAverage(myFinch);
 
@@ -80,7 +80,7 @@ namespace Captstone_Project
                     isHit = false;
                 }
 
-                myFinch.wait(1000);
+               // myFinch.wait(1000);
             
             return isHit;
         }
@@ -109,27 +109,21 @@ namespace Captstone_Project
         {
             // Variable: 
             double ambientTemperature = myFinch.getTemperature();
-            const double threshold = 0.5;
+            const double threshold = 1;
 
             double minTemperatureThreshold = ambientTemperature - threshold;
             double currentTemperature = myFinch.getTemperature();
 
             bool isHit = false;
-
-            
+                        
                 currentTemperature = myFinch.getTemperature();
-
-
+            
                 if (currentTemperature < minTemperatureThreshold)
                 {
                     isHit = true;
                 }
-                else
-                {
-                    isHit = false;
-                }
-
-               myFinch.wait(1000);
+             
+            //   myFinch.wait(1000);
             
 
             return isHit;

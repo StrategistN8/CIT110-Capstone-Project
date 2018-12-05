@@ -17,14 +17,17 @@ namespace Captstone_Project
         private bool _isFrozen;
         private bool _isHit;
         private bool _isVulnerable;
+        private bool _isDefeated;
         private int _vulnerablityDuration;
         private int _motorSpeed;
         private int hitPoints;
         private int _hitsSuffered;
         private int _scoreModifier;
         private Difficulty _difficultySetting;
+        
 
-    
+ 
+
 
         #endregion
 
@@ -45,6 +48,12 @@ namespace Captstone_Project
         {
             get { return _isVulnerable; }
             set { _isVulnerable = value; }
+        }
+
+        public bool isDefeated
+        {
+            get { return _isDefeated; }
+            set { _isDefeated = value; }
         }
 
         public int vulnerabilityDuration

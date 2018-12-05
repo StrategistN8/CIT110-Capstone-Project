@@ -42,6 +42,9 @@ namespace Captstone_Project
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
 
+            // Connecting to Finch to make debugging easier:
+            myFinch.connect();
+
             // Welcome Screen:
             userName = DisplayWelcomeScreen();
 
@@ -340,9 +343,11 @@ namespace Captstone_Project
         /// <param name="difficulty"></param>
         static void DisplayGameInProgress(Finch myFinch, FinchOperator myFinchOperator)
         {
-            bool isDefeated = false;
             Monitor hitTracker = new Monitor();
 
+            DisplayHeader("DARTH FINCH:");
+
+            Console.WriteLine("Darth Finch is advancing!");
 
             for (int i = 0; i < 255; i++)
             {
@@ -350,21 +355,22 @@ namespace Captstone_Project
             }
 
             // FinchOperator.PlayImpMarchShort(myFinch);
-            while (!isDefeated)
+            while (!myFinchOperator.isDefeated)
             {
+                hitTracker.IsFrozen = Monitor.HitDetection(myFinch); //Monitor.FreezeDetection(myFinch);
+                hitTracker.IsHit = Monitor.FreezeDetection(myFinch);//Monitor.HitDetection(myFinch);
 
-                hitTracker.IsFrozen = Monitor.FreezeDetection(myFinch);
-                hitTracker.IsHit = Monitor.HitDetection(myFinch);
-
-                DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
 
 
                 DisplayHealthStatus(myFinchOperator);
-                isDefeated = CheckHealth(myFinchOperator);
+                        
+                DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
+                                
+                myFinchOperator.isDefeated = CheckHealth(myFinchOperator);
 
-                FinchOperator.LEDSettings(myFinch, myFinchOperator);
-                /*FinchOperator.MotorSettings(myFinch, difficulty, myFinchOperator);*/
-                myFinch.wait(myFinchOperator.vulnerabilityDuration);
+               //FinchOperator.LEDSettings(myFinch, myFinchOperator);
+               // FinchOperator.MotorSettings(myFinch, myFinchOperator);
+                myFinch.wait(1000);
             }
 
             for (int i = 0; i < 255; i++)
@@ -383,19 +389,19 @@ namespace Captstone_Project
             switch (myFinchOperator.DifficultySetting)
             {
                 case Difficulty.MERCIFUL:
-                    myFinchOperator.vulnerabilityDuration = 4000;
+                    myFinchOperator.vulnerabilityDuration = 6000;
                     myFinchOperator.MotorSpeed = 100;
                     myFinchOperator.HitPoints = 1;
                     myFinchOperator.ScoreModifier = 5;
                     break;
                 case Difficulty.NORMAL:
-                    myFinchOperator.vulnerabilityDuration = 2000;
+                    myFinchOperator.vulnerabilityDuration = 5000;
                     myFinchOperator.MotorSpeed = 175;
                     myFinchOperator.HitPoints = 3;
                     myFinchOperator.ScoreModifier = 10;
                     break;
                 case Difficulty.RUTHLESS:
-                    myFinchOperator.vulnerabilityDuration = 1000;
+                    myFinchOperator.vulnerabilityDuration = 4000;
                     myFinchOperator.MotorSpeed = 255;
                     myFinchOperator.HitPoints = 5;
                     myFinchOperator.ScoreModifier = 20;
@@ -417,8 +423,8 @@ namespace Captstone_Project
             {
                 Console.WriteLine();
                 Console.WriteLine("The blast is deflected!");
-                //myFinchOperator.IsVulnerable = false;
                 FinchOperator.LEDSettings(myFinch, myFinchOperator);
+                myFinch.wait(500);
             }
 
             if (hitTracker.IsHit == false && hitTracker.IsFrozen == true)
@@ -463,9 +469,9 @@ namespace Captstone_Project
         /// <param name="myFinchOperator"></param>
         static void DisplayHealthStatus(FinchOperator myFinchOperator)
         {
-            Console.WriteLine(myFinchOperator.HitPoints);
-            Console.WriteLine();
-            Console.WriteLine(myFinchOperator.HitsSuffered);
+            DisplayHeader("DARTH FINCH");
+            Console.Write($"Current Hitpoints: {myFinchOperator.HitPoints - myFinchOperator.HitsSuffered}");
+            
         }
 
         /// <summary>
