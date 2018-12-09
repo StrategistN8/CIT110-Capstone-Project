@@ -20,7 +20,7 @@ namespace Captstone_Project
         #endregion
 
         #region PROPERTIES
-             
+
         public double CurrentTemperature
         {
             get { return _currentTemperature; }
@@ -58,7 +58,7 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <returns></returns>
-      public static bool HitDetection(Finch myFinch)
+        public static bool HitDetection(Finch myFinch)
         {
             // Local Variables: 
             double ambientLight = GetLightAverage(myFinch);
@@ -71,13 +71,13 @@ namespace Captstone_Project
             currentLight = GetLightAverage(myFinch);
 
 
-                if (currentLight > maxLightThreshold)
-                {
-                    isHit = true;
-                }
-               
-               // myFinch.wait(1000);
-            
+            if (currentLight > maxLightThreshold)
+            {
+                isHit = true;
+            }
+
+            // myFinch.wait(1000);
+
             return isHit;
         }
 
@@ -86,7 +86,7 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <returns></returns>
-      public static int GetLightAverage(Finch myFinch)
+        public static int GetLightAverage(Finch myFinch)
         {
             // Variables: 
             int leftSensor = myFinch.getLeftLightSensor();
@@ -101,31 +101,28 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="myFinch"></param>
         /// <returns>isHit</returns>
-      public static bool FreezeDetection(Finch myFinch)
+        public static bool FreezeDetection(Finch myFinch)
         {
             // Variable: 
             double ambientTemperature = myFinch.getTemperature();
-            const double threshold = 1;
+            const double threshold = 1.1;
 
             double minTemperatureThreshold = ambientTemperature - threshold;
             double currentTemperature = myFinch.getTemperature();
 
             bool isHit = false;
-                        
-                currentTemperature = myFinch.getTemperature();
-            
-                if (currentTemperature < minTemperatureThreshold)
-                {
-                    isHit = true;
-                }
-             
-            //   myFinch.wait(1000);
-            
+
+            currentTemperature = myFinch.getTemperature();
+
+            if (currentTemperature <= minTemperatureThreshold)
+            {
+                isHit = true;
+            }
 
             return isHit;
         }
 
-        
+
         #endregion
 
     }

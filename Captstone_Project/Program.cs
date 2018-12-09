@@ -73,8 +73,8 @@ namespace Captstone_Project
             Console.Clear();
             DisplayHeader("DARTH FINCH");
             Console.WriteLine();
-            Console.WriteLine("Please enter player name:");
-            Console.Write("-> ");
+            Console.WriteLine("\tPlease enter player name:");
+            Console.Write("\t-> ");
             userName = Console.ReadLine();
 
             // Echoing the name to confirm:
@@ -82,7 +82,7 @@ namespace Captstone_Project
             Console.Clear();
             DisplayHeader("DARTH FINCH");
             Console.WriteLine();
-            Console.WriteLine("{0}, welcome!", userName);
+            Console.WriteLine("\t{0}, welcome!", userName);
 
 
             DisplayContinuePrompt();
@@ -108,7 +108,7 @@ namespace Captstone_Project
             DisplayHeader("DARTH FINCH");
             Console.WriteLine();
             
-            Console.WriteLine("Initializing...");
+            Console.WriteLine("\t\tInitializing...");
 
             // Just in case the user attempts to run the game without a Finch - it doesn't crash, but it doesn't make sense either.
             if (!myFinch.connect())
@@ -125,13 +125,13 @@ namespace Captstone_Project
             // Main Gameplay Loop:
             while (!myFinchOperator.isDefeated && timeInLoop <= myFinchOperator.TimeAvailable)
             {
-                hitTracker.IsFrozen = Monitor.HitDetection(myFinch);
-                hitTracker.IsHit = Monitor.FreezeDetection(myFinch);
+                hitTracker.IsFrozen = Monitor.FreezeDetection(myFinch);
+                hitTracker.IsHit = Monitor.HitDetection(myFinch);
 
                 DisplayHeader("DARTH FINCH:");
 
-                Console.WriteLine("Darth Finch is active!");
-                Console.WriteLine($"Time Remaining: [{myFinchOperator.TimeAvailable - timeInLoop}]");
+                Console.WriteLine("\tDarth Finch is active!");
+                Console.WriteLine($" Time Remaining: [{myFinchOperator.TimeAvailable - timeInLoop}]");
                 DisplayHealthStatus(myFinchOperator);
 
                 DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
@@ -179,9 +179,9 @@ namespace Captstone_Project
             Console.Clear();
             Console.WriteLine("***************[Goodbye!]*****************");
             Console.WriteLine();
-            Console.WriteLine("Thank you, {0}, for using this application!", closingText);
+            Console.WriteLine("\tThank you, {0}, for using this application!", closingText);
             Console.WriteLine();
-            Console.WriteLine("Press any key to end the application {0}.", closingText);
+            Console.WriteLine("\tPress any key to end the application {0}.", closingText);
             Console.ReadKey();
 
             myFinch.disConnect();
@@ -195,13 +195,14 @@ namespace Captstone_Project
         {
             string dataPath = @"Data\Scores.txt";
             List<string> playerScoreList = new List<string>();
-            string playerScoreToSave = playerScore.PlayerName + "," + playerScore.PlayerScore.ToString();
+            string playerScoreToSave = "\n" + playerScore.PlayerName + ", " + playerScore.PlayerScore.ToString();
 
             playerScoreList.Add(playerScoreToSave);
 
-            File.AppendAllText(dataPath, playerScoreToSave);
+            File.AppendAllLines(dataPath, playerScoreList);
 
-            Console.WriteLine("Score Saved.");
+            Console.WriteLine();
+            Console.WriteLine("\tScore Saved.");
             DisplayContinuePrompt();
 
         }
@@ -225,12 +226,11 @@ namespace Captstone_Project
                 //File.WriteAllLines(dataPath, scoreList);
 
                 string[] myArray = File.ReadAllLines(dataPath);
-                string[] scoreArray = new string[2];
-
+                
                 DisplaySpacer();
                 foreach (string score in myArray)
                 {
-                    scoreArray = score.Split(',');
+                    string[] scoreArray = score.Split(',');
                     tempPlayerScore.PlayerName = scoreArray[0];
                     tempPlayerScore.PlayerScore = int.Parse(scoreArray[1]);
                     Console.WriteLine($"{tempPlayerScore.PlayerName}: {tempPlayerScore.PlayerScore} points");
@@ -460,10 +460,11 @@ namespace Captstone_Project
             DisplayHeader("DARTH FINCH: SELECT DIFFICULTY");
             foreach (var setting in Enum.GetValues(typeof(Difficulty)))
             {
-                Console.WriteLine(setting);
+                Console.WriteLine("\t" + setting);
             }
 
-            Console.WriteLine("Select Difficulty -> ");
+            Console.WriteLine();
+            Console.WriteLine("\tSelect Difficulty -> ");
             while (!Enum.TryParse(Console.ReadLine().ToUpper(), out difficulty))
             {
                 Console.WriteLine("That is not a valid difficulty level. Please try again!");
@@ -472,7 +473,8 @@ namespace Captstone_Project
 
 
             myFinchOperator.DifficultySetting = difficulty;
-            Console.WriteLine($"You selected {myFinchOperator.DifficultySetting}");
+            Console.WriteLine();
+            Console.WriteLine($" You selected {myFinchOperator.DifficultySetting}");
             DisplayContinuePrompt();
 
         }
@@ -531,7 +533,7 @@ namespace Captstone_Project
             }
 
             // Statment to indicate a hit while shields are down.
-            if (hitTracker.IsHit == false && hitTracker.IsFrozen == true)
+            if (hitTracker.IsFrozen == true)
             {
                 Console.WriteLine();
                 Console.WriteLine("That got him! Strike now while he is stunned!");
@@ -563,7 +565,7 @@ namespace Captstone_Project
             {
                 Console.WriteLine("Nice hit! He'll feel that for sure.");
                 myFinchOperator.HitsSuffered += 1;
-
+                myFinch.wait(500);
             }
 
             else
@@ -585,7 +587,7 @@ namespace Captstone_Project
         static void DisplayHealthStatus(FinchOperator myFinchOperator)
         {
           
-            Console.Write($"Current Hitpoints: {myFinchOperator.HitPoints - myFinchOperator.HitsSuffered}");
+            Console.Write("\tCurrent Hitpoints: " + $"{myFinchOperator.HitPoints - myFinchOperator.HitsSuffered}");
             
         }
 
@@ -599,7 +601,12 @@ namespace Captstone_Project
             bool isDefeated = false;
 
             if (myFinchOperator.HitsSuffered >= myFinchOperator.HitPoints)
-            { isDefeated = true; }
+            {
+                isDefeated = true;
+
+                Console.WriteLine("\tDarth Finch has been defeated!");
+                
+            }
 
             return isDefeated;
 
