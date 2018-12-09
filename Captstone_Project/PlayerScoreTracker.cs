@@ -9,7 +9,7 @@ namespace Captstone_Project
     class PlayerScoreTracker
     {
         #region FIELDS
-        private int playerScore;
+        private int playerScore = 0;
         private string playerName;
         #endregion
 
@@ -25,6 +25,17 @@ namespace Captstone_Project
             get { return playerName; }
             set { playerName = value; }
         }
+        #endregion
+
+        #region CONSTRUCTORS
+
+        static PlayerScoreTracker()
+        { }
+
+        #endregion
+
+        #region METHODS
+
         #endregion
     }
 }

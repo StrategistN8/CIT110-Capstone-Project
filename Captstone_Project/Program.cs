@@ -15,7 +15,7 @@ namespace Captstone_Project
     // Author: Jim Lyons
     // Description: CIT:110 Capstone Project.  A Finch-based game.
     // Date Created: 12/1/2018
-    // Date Last Modified: 12/1/2018
+    // Date Last Modified: 12/9/2018
     //**************************************************************************************
 
 
@@ -34,16 +34,17 @@ namespace Captstone_Project
             // Local Variables:
             Finch myFinch = new Finch();
             FinchOperator myFinchOperator = new FinchOperator();
+            myFinchOperator.DifficultySetting = Difficulty.NORMAL;
             bool runApp = true;
             string userName;
 
             // Setting up the console:
-            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
 
             // Connecting to Finch to make debugging easier:
-            myFinch.connect();
+           // myFinch.connect();
 
             // Welcome Screen:
             userName = DisplayWelcomeScreen();
@@ -57,7 +58,7 @@ namespace Captstone_Project
             DisplayClosingScreen(userName, myFinch);
         }
 
-        #region SCREENS
+        #region APPLICATION SCREENS
 
         /// <summary>
         /// Welcome Screen: Greets the user and asks for their name.
@@ -88,172 +89,62 @@ namespace Captstone_Project
 
             return userName;
         }
-
+              
         /// <summary>
-        /// Displays the main menu: Main application screen.
+        /// Screen that runs the gameplay:
         /// </summary>
-        /// <param name="userName"></param>
         /// <param name="myFinch"></param>
         /// <param name="myFinchOperator"></param>
-        /// <returns></returns>
-        static bool DisplayMainMenu(string userName, Finch myFinch, FinchOperator myFinchOperator)
+        /// <param name="difficulty"></param>
+        static void DisplayGameInProgress(Finch myFinch, FinchOperator myFinchOperator)
         {
-            // Local Variables:
-            bool runApp;
-            string menuChoice;
+            // Instantiates a new hit tracker:
+            Monitor hitTracker = new Monitor();
+            int timeInLoop = 0;
 
+            //Variables:
+            myFinchOperator.isDefeated = false;
 
             DisplayHeader("DARTH FINCH");
-
-            //Display Menu:
-            DisplaySpacer();
-            Console.WriteLine("\t1.) [PLAY!]");
-            Console.WriteLine("\t2.) [How to play]");
-            Console.WriteLine("\t3.) [Setup]");
-            Console.WriteLine("\t4.) [Save Score]");
-            Console.WriteLine("\t5.) [Load Scores]");
             Console.WriteLine();
-            Console.WriteLine("\tE) Exit Game");
-            DisplaySpacer();
-            Console.Write("\tInput -> ");
-            menuChoice = Console.ReadLine();
+            
+            Console.WriteLine("Initializing...");
 
-            // Processes menu selection: 
-            runApp = MenuSwitchBoard(userName, menuChoice, myFinch, myFinchOperator);
-
-            return runApp;
-        }
-
-        /// <summary>
-        /// Processes menu selection for DisplayMainMenu.
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="menuChoice"></param>
-        /// <returns></returns>
-        static bool MenuSwitchBoard(string userName, string menuChoice, Finch myFinch, FinchOperator myFinchOperator)
-        {
-            //Local Variables:
-            Monitor saberHit = new Monitor();
-            bool runApp = true;
-
-            switch (menuChoice.ToUpper())
+            // Just in case the user attempts to run the game without a Finch - it doesn't crash, but it doesn't make sense either.
+            if (!myFinch.connect())
             {
-                case "1":
-                    DisplayGameInProgress(myFinch, myFinchOperator);
-                    break;
-                case "2":
-                    DisplayInformationScreen(userName);
-                    break;
-                case "3":
-                    DisplaySetupMenu(userName, myFinch, myFinchOperator);
-                    break;
-                case "4":
-                    break;
-                case "5":
-                    break;
-                case "E":
-                    runApp = false;
-                    break;
-                default:
-                    Console.WriteLine("'{0}' is not a valid input. Please try again!", menuChoice);
-                    DisplayContinuePrompt();
-                    Console.Clear();
-                    break;
-            }
-
-            return runApp;
-        }
-
-        /// <summary>
-        /// Gets the desired difficulty from the user.
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <returns></returns>
-        static void GetDifficultySetting(FinchOperator myFinchOperator)
-        {
-            // Local Variables:
-            Difficulty difficulty;
-
-            foreach (var setting in Enum.GetValues(typeof(Difficulty)))
-            {
-                Console.WriteLine(setting);
-            }
-
-            Console.WriteLine("Select Difficulty -> ");
-            while (!Enum.TryParse(Console.ReadLine().ToUpper(), out difficulty))
-            {
-                Console.WriteLine("That is not a valid difficulty level. Please try again!");
+                DisplayHeader("DARTH FINCH");
+                Console.WriteLine("\tNo finch detected. Please connect a Finch before proceeding!");
                 DisplayContinuePrompt();
+                FinchOperator.EstablishFinchConnection(myFinch);
             }
 
-            myFinchOperator.DifficultySetting = difficulty;
+            // Little indicator that the game has begun:
+            FinchOperator.PlayImpMarchShort(myFinch);
 
-        }
-
-        /// <summary>
-        /// Setup menu: Allows the user to access Finch connection and difficulty settings.
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="myFinch"></param>
-        /// <param name="myFinchOperator"></param>
-        static void DisplaySetupMenu(string userName, Finch myFinch, FinchOperator myFinchOperator)
-        {
-            // Local Variables:
-            string menuChoice;
-            bool returnToPrevious = false;
-
-            while (!returnToPrevious)
+            // Main Gameplay Loop:
+            while (!myFinchOperator.isDefeated && timeInLoop <= myFinchOperator.TimeAvailable)
             {
-                DisplayHeader("SET UP");
+                hitTracker.IsFrozen = Monitor.HitDetection(myFinch);
+                hitTracker.IsHit = Monitor.FreezeDetection(myFinch);
 
-                //Display Menu:
-                DisplaySpacer();
-                Console.WriteLine("\t1.) [Connect to Finch Robot]");
-                Console.WriteLine("\t2.) [Select Difficulty]");
-                Console.WriteLine("\t3.) [Change Player Name]");
+                DisplayHeader("DARTH FINCH:");
 
-                Console.WriteLine("\tM) Return to Main Menu");
-                DisplaySpacer();
-                Console.Write("\tInput -> ");
-                menuChoice = Console.ReadLine();
+                Console.WriteLine("Darth Finch is active!");
+                Console.WriteLine($"Time Remaining: [{myFinchOperator.TimeAvailable - timeInLoop}]");
+                DisplayHealthStatus(myFinchOperator);
 
-                // Processes menu selection: 
-                returnToPrevious = SettingsSwitchBoard(menuChoice, myFinch, myFinchOperator);
+                DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
+
+                myFinchOperator.isDefeated = CheckHealth(myFinchOperator);
+
+                //FinchOperator.LEDSettings(myFinch, myFinchOperator);
+                // FinchOperator.MotorSettings(myFinch, myFinchOperator);
+                myFinch.wait(1000);
+                timeInLoop++;
             }
 
-        }
 
-        /// <summary>
-        /// Processes menu selection for DisplaySetupMenu
-        /// </summary>
-        /// <param name="menuChoice"></param>
-        /// <param name="myFinch"></param>
-        /// <param name="myFinchOperator"></param>
-        static bool SettingsSwitchBoard(string menuChoice, Finch myFinch, FinchOperator myFinchOperator)
-        {
-            // local variables: 
-            bool returnToPrevious = false;
-
-            switch (menuChoice.ToUpper())
-            {
-                case "1":
-                    FinchOperator.EstablishFinchConnection(myFinch);
-                    break;
-                case "2":
-                    GetDifficultySetting(myFinchOperator);
-                    DifficultySettings(myFinchOperator);
-                    break;
-                case "3":
-                    DisplayWelcomeScreen();
-                    break;
-                case "M":
-                    returnToPrevious = true;
-                    break;
-                default:
-                    break;
-            }
-
-            return returnToPrevious;
         }
 
         /// <summary>
@@ -297,88 +188,295 @@ namespace Captstone_Project
         }
 
         /// <summary>
+        /// Saves the players score to a file:
+        /// </summary>
+        /// <param name="playerScore"></param>
+        static void DisplaySavePlayerScoreToFile(PlayerScoreTracker playerScore)
+        {
+            string dataPath = @"Data\Scores.txt";
+            List<string> playerScoreList = new List<string>();
+            string playerScoreToSave = playerScore.PlayerName + "," + playerScore.PlayerScore.ToString();
+
+            playerScoreList.Add(playerScoreToSave);
+
+            File.AppendAllText(dataPath, playerScoreToSave);
+
+            Console.WriteLine("Score Saved.");
+            DisplayContinuePrompt();
+
+        }
+
+        /// <summary>
         /// Reads the high scores list from the file.
         /// </summary>
         static void DisplayReadScoreFromFile()
         {
             // Local Variables:
             string dataPath = @"Data\Scores.txt";
-
+            List<PlayerScoreTracker> scoreList = new List<PlayerScoreTracker>();
+            PlayerScoreTracker tempPlayerScore = new PlayerScoreTracker();
             try
             {
-                DisplayHeader("Scores:");
+                DisplayHeader("Load Scores:");
                 Console.WriteLine();
-                Console.WriteLine("Press any key to Read Data from File:");
+                Console.WriteLine("\tPress any key to retrieve saved scores:");
                 Console.ReadKey();
-                Console.WriteLine();
+
+                //File.WriteAllLines(dataPath, scoreList);
+
+                string[] myArray = File.ReadAllLines(dataPath);
+                string[] scoreArray = new string[2];
+
+                DisplaySpacer();
+                foreach (string score in myArray)
+                {
+                    scoreArray = score.Split(',');
+                    tempPlayerScore.PlayerName = scoreArray[0];
+                    tempPlayerScore.PlayerScore = int.Parse(scoreArray[1]);
+                    Console.WriteLine($"{tempPlayerScore.PlayerName}: {tempPlayerScore.PlayerScore} points");
+                }
 
                 DisplayContinuePrompt();
             }
             catch (FileNotFoundException)
             {
                 DisplayHeader("ERROR");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Unable to read data file. The file may have been deleted or corrupted.");
+                Console.WriteLine("\tUnable to read scores from the file. The file may have been deleted or corrupted.");
                 Console.WriteLine();
             }
             catch (NullReferenceException)
             {
                 DisplayHeader("ERROR");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Unable to retrieve data. No data was found.");
+                Console.WriteLine("\tUnable to retrieve scores. No scores were found.");
                 Console.WriteLine();
+            }
+            catch (Exception e)
+            {
+                DisplayHeader("ERROR");
+                Console.WriteLine("\tAn error has occured. Please see the following for more information");
+                Console.WriteLine("[{0}]",e);
+            }
+        }
+     
+        /// <summary>
+        /// Game Over Screen:
+        /// </summary>
+        /// <param name="currentScore"></param>
+        static void DisplayGameOver(PlayerScoreTracker currentScore, Finch myFinch)
+        {
+            DisplayHeader("GAME OVER");
+
+            DisplayPlayerScore(currentScore);
+
+            FinchOperator.PlayGameOverMarch(myFinch);
+
+            DisplayContinuePrompt();
+
+
+        }
+        
+        #endregion
+
+        #region MENU SCREENS: 
+
+        /// <summary>
+        /// Displays the main menu: Main application screen.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="myFinch"></param>
+        /// <param name="myFinchOperator"></param>
+        /// <returns></returns>
+        static bool DisplayMainMenu(string userName, Finch myFinch, FinchOperator myFinchOperator)
+        {
+            // Local Variables:
+            bool runApp;
+            string menuChoice;
+
+
+            DisplayHeader("DARTH FINCH");
+
+            //Display Menu:
+            DisplaySpacer();
+            Console.WriteLine("\t1.) [PLAY!]");
+            Console.WriteLine("\t2.) [How to play]");
+            Console.WriteLine("\t3.) [Setup]");
+            Console.WriteLine("\t4.) [Save Score]");
+            Console.WriteLine("\t5.) [Load Scores]");
+            Console.WriteLine("\t6.) [The Imperial March]");
+            Console.WriteLine();
+            Console.WriteLine("\tE) Exit Game");
+            DisplaySpacer();
+            Console.Write("\tInput -> ");
+            menuChoice = Console.ReadLine();
+
+            // Processes menu selection: 
+            runApp = MenuSwitchBoard(userName, menuChoice, myFinch, myFinchOperator);
+
+            return runApp;
+        }
+    
+        /// <summary>
+        /// Setup menu: Allows the user to access Finch connection and difficulty settings.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="myFinch"></param>
+        /// <param name="myFinchOperator"></param>
+        static void DisplaySetupMenu(string userName, Finch myFinch, FinchOperator myFinchOperator)
+        {
+            // Local Variables:
+            string menuChoice;
+            bool returnToPrevious = false;
+
+            while (!returnToPrevious)
+            {
+                DisplayHeader("SET UP");
+
+                //Display Menu:
+                DisplaySpacer();
+                Console.WriteLine("\t1.) [Connect to Finch Robot]");
+                Console.WriteLine("\t2.) [Select Difficulty]");
+                Console.WriteLine("\t3.) [Change Player Name]");
+
+                Console.WriteLine("\tM) Return to Main Menu");
+                DisplaySpacer();
+                Console.Write("\tInput -> ");
+                menuChoice = Console.ReadLine();
+
+                // Processes menu selection: 
+                returnToPrevious = SettingsSwitchBoard(menuChoice, myFinch, myFinchOperator);
             }
 
         }
+
 
         #endregion
 
-        #region GAMEPLAY ELEMENTS
+        #region MENU HELPER METHODS: 
 
         /// <summary>
-        /// Runs the gameplay:
+        /// Processes menu selection for DisplaySetupMenu
         /// </summary>
+        /// <param name="menuChoice"></param>
         /// <param name="myFinch"></param>
         /// <param name="myFinchOperator"></param>
-        /// <param name="difficulty"></param>
-        static void DisplayGameInProgress(Finch myFinch, FinchOperator myFinchOperator)
+        static bool SettingsSwitchBoard(string menuChoice, Finch myFinch, FinchOperator myFinchOperator)
         {
-            Monitor hitTracker = new Monitor();
+            // local variables: 
+            bool returnToPrevious = false;
 
-            DisplayHeader("DARTH FINCH:");
-
-            Console.WriteLine("Darth Finch is advancing!");
-
-            for (int i = 0; i < 255; i++)
+            switch (menuChoice.ToUpper())
             {
-                myFinch.setLED(i, 0, 0);
+                case "1":
+                    FinchOperator.EstablishFinchConnection(myFinch);
+                    break;
+                case "2":
+                    GetDifficultySetting(myFinchOperator);
+                    DifficultySettings(myFinchOperator);
+                    break;
+                case "3":
+                    DisplayWelcomeScreen();
+                    break;
+                case "M":
+                    returnToPrevious = true;
+                    break;
+                default:
+                    Console.WriteLine("'{0}' is not a valid input. Please try again!", menuChoice);
+                    DisplayContinuePrompt();
+                    Console.Clear();
+                    break;
             }
 
-            // FinchOperator.PlayImpMarchShort(myFinch);
-            while (!myFinchOperator.isDefeated)
-            {
-                hitTracker.IsFrozen = Monitor.HitDetection(myFinch); //Monitor.FreezeDetection(myFinch);
-                hitTracker.IsHit = Monitor.FreezeDetection(myFinch);//Monitor.HitDetection(myFinch);
-
-
-
-                DisplayHealthStatus(myFinchOperator);
-                        
-                DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
-                                
-                myFinchOperator.isDefeated = CheckHealth(myFinchOperator);
-
-               //FinchOperator.LEDSettings(myFinch, myFinchOperator);
-               // FinchOperator.MotorSettings(myFinch, myFinchOperator);
-                myFinch.wait(1000);
-            }
-
-            for (int i = 0; i < 255; i++)
-            {
-                myFinch.setLED(255 - i, 0, 0);
-            }
+            return returnToPrevious;
         }
+       
+        /// <summary>
+        /// Processes menu selection for DisplayMainMenu.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="menuChoice"></param>
+        /// <returns></returns>
+        static bool MenuSwitchBoard(string userName, string menuChoice, Finch myFinch, FinchOperator myFinchOperator)
+        {
+            //Local Variables:
+            Monitor saberHit = new Monitor();
+            PlayerScoreTracker playerScore = new PlayerScoreTracker();
+            playerScore.PlayerName = userName;
+           
 
+            bool runApp = true;
+
+            switch (menuChoice.ToUpper())
+            {
+                case "1":
+                    DisplayGameInProgress(myFinch, myFinchOperator);
+                    CurrentPlayerScore(userName, playerScore, myFinchOperator);
+                    DisplayGameOver(playerScore, myFinch);
+                    break;
+                case "2":
+                    DisplayInformationScreen(userName);
+                    break;
+                case "3":
+                    DisplaySetupMenu(userName, myFinch, myFinchOperator);
+                    break;
+                case "4":
+                    DisplaySavePlayerScoreToFile(playerScore);
+                    break;
+                case "5":
+                    DisplayReadScoreFromFile();
+                    break;
+                case "6":
+                    DisplayHeader("DARTH FINCH");
+                    Console.WriteLine("\tDarth Finch is amused by your request, but is willing to humor you.");
+                    Console.WriteLine("\t(Please allow the Finch to finish, you will see a continue prompt when it is done)");
+                    FinchOperator.PlayImpMarch(myFinch);
+                    DisplayContinuePrompt();
+                    break;
+                case "E":
+                    runApp = false;
+                    break;
+                default:
+                    Console.WriteLine("'{0}' is not a valid input. Please try again!", menuChoice);
+                    DisplayContinuePrompt();
+                    Console.Clear();
+                    break;
+            }
+
+            return runApp;
+        }
+        #endregion
+
+        #region GAMEPLAY METHODS:
+
+        /// <summary>
+        /// Gets the desired difficulty from the user.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        static void GetDifficultySetting(FinchOperator myFinchOperator)
+        {
+            // Local Variables:
+            Difficulty difficulty;
+
+            DisplayHeader("DARTH FINCH: SELECT DIFFICULTY");
+            foreach (var setting in Enum.GetValues(typeof(Difficulty)))
+            {
+                Console.WriteLine(setting);
+            }
+
+            Console.WriteLine("Select Difficulty -> ");
+            while (!Enum.TryParse(Console.ReadLine().ToUpper(), out difficulty))
+            {
+                Console.WriteLine("That is not a valid difficulty level. Please try again!");
+                DisplayContinuePrompt();
+            }
+
+
+            myFinchOperator.DifficultySetting = difficulty;
+            Console.WriteLine($"You selected {myFinchOperator.DifficultySetting}");
+            DisplayContinuePrompt();
+
+        }
+       
         /// <summary>
         /// Takes the difficulty selected by the player and assigns values for use in other Finch operations based on that difficulty.
         /// </summary>
@@ -386,24 +484,28 @@ namespace Captstone_Project
         /// <returns></returns>
         static FinchOperator DifficultySettings(FinchOperator myFinchOperator)
         {
+            // Sets certain values depending on the selected difficulty. The default is NORMAL.
             switch (myFinchOperator.DifficultySetting)
             {
                 case Difficulty.MERCIFUL:
                     myFinchOperator.vulnerabilityDuration = 6000;
                     myFinchOperator.MotorSpeed = 100;
                     myFinchOperator.HitPoints = 1;
+                    myFinchOperator.TimeAvailable = 60;
                     myFinchOperator.ScoreModifier = 5;
                     break;
                 case Difficulty.NORMAL:
                     myFinchOperator.vulnerabilityDuration = 5000;
                     myFinchOperator.MotorSpeed = 175;
                     myFinchOperator.HitPoints = 3;
+                    myFinchOperator.TimeAvailable = 120;
                     myFinchOperator.ScoreModifier = 10;
                     break;
                 case Difficulty.RUTHLESS:
                     myFinchOperator.vulnerabilityDuration = 4000;
                     myFinchOperator.MotorSpeed = 255;
                     myFinchOperator.HitPoints = 5;
+                    myFinchOperator.TimeAvailable = 120;
                     myFinchOperator.ScoreModifier = 20;
                     break;
                 default:
@@ -419,25 +521,39 @@ namespace Captstone_Project
         /// </summary>
         static void DisplayVulnerbilityStatus(Finch myFinch, Monitor hitTracker, FinchOperator myFinchOperator)
         {
+            // Statment to indicate a hit while shields are up.
             if (hitTracker.IsHit == true && hitTracker.IsFrozen == false)
             {
                 Console.WriteLine();
                 Console.WriteLine("The blast is deflected!");
                 FinchOperator.LEDSettings(myFinch, myFinchOperator);
-                myFinch.wait(500);
+                myFinch.wait(1000);
             }
 
+            // Statment to indicate a hit while shields are down.
             if (hitTracker.IsHit == false && hitTracker.IsFrozen == true)
             {
                 Console.WriteLine();
                 Console.WriteLine("That got him! Strike now while he is stunned!");
+
+                // Sets the finch to vulnerable so it can take hits:
                 myFinchOperator.IsVulnerable = true;
+                
+                // Turns off the LED to indicate shields are down.
                 FinchOperator.LEDSettings(myFinch, myFinchOperator);
+
+                // Enters this method to determine if a hit is suffered or not.
                 ShieldsDown(myFinch, hitTracker, myFinchOperator);
             }
 
         }
 
+        /// <summary>
+        /// Method that controls hits while shields are down.
+        /// </summary>
+        /// <param name="myFinch"></param>
+        /// <param name="hitTracker"></param>
+        /// <param name="myFinchOperator"></param>
         static void ShieldsDown(Finch myFinch, Monitor hitTracker, FinchOperator myFinchOperator)
         {
             hitTracker.IsHit = Monitor.HitDetection(myFinch);
@@ -456,20 +572,19 @@ namespace Captstone_Project
 
             }
             myFinchOperator.IsVulnerable = false;
-
+            myFinch.wait(500);
             FinchOperator.LEDSettings(myFinch, myFinchOperator);
 
 
         }
-
-
+        
         /// <summary>
         /// Displays current health and how many hits have been sustained.
         /// </summary>
         /// <param name="myFinchOperator"></param>
         static void DisplayHealthStatus(FinchOperator myFinchOperator)
         {
-            DisplayHeader("DARTH FINCH");
+          
             Console.Write($"Current Hitpoints: {myFinchOperator.HitPoints - myFinchOperator.HitsSuffered}");
             
         }
@@ -489,19 +604,33 @@ namespace Captstone_Project
             return isDefeated;
 
         }
+        #endregion
+
+        #region SCORING METHODS:
+        
+        /// <summary>
+        /// Display the player's score:
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="myFinchOperator"></param>
+        static void DisplayPlayerScore(PlayerScoreTracker currentScore)
+        {
+            Console.WriteLine("\t{0} scored {1}", currentScore.PlayerName, currentScore.PlayerScore);      
+        }
+
 
         /// <summary>
         /// Keeps track of the current player score and updates the player's score.
         /// </summary>
         /// <param name="currentScore"></param>
         /// <returns></returns>
-        static int PlayerScore(string userName, FinchOperator myFinchOperator)
+        static PlayerScoreTracker CurrentPlayerScore(string userName, PlayerScoreTracker currentScore, FinchOperator myFinchOperator)
         {
-            int currentScore = myFinchOperator.HitsSuffered * myFinchOperator.ScoreModifier;
+            currentScore.PlayerScore = myFinchOperator.HitsSuffered * myFinchOperator.ScoreModifier;
+            currentScore.PlayerName = userName;
+
             return currentScore;
         }
-
-
         #endregion
 
         #region HELPER METHODS:

@@ -24,9 +24,13 @@ namespace Captstone_Project
         private int _hitsSuffered;
         private int _scoreModifier;
         private Difficulty _difficultySetting;
-        
+        private int _timeAvailable;
 
- 
+       
+
+
+
+
 
 
         #endregion
@@ -92,6 +96,11 @@ namespace Captstone_Project
             set { _difficultySetting = value; }
         }
 
+        public int TimeAvailable
+        {
+            get { return _timeAvailable; }
+            set { _timeAvailable = value; }
+        }
         #endregion
 
         #region CONSTRUCTORS:
@@ -112,17 +121,23 @@ namespace Captstone_Project
             Console.WriteLine("Please plug your finch into the computer. Then, press any key to continue.");
             Console.ReadKey();
 
+            //Attempts to Connect to the Finch Robot:
             myFinch.connect();
-            DisplayContinuePrompt();
-
-            if (!myFinch.connect())
+         
+            if (!myFinch.connect()) // If connection fails:
             {
                 Console.WriteLine("Unable to connect to the finch. Please check your cable connection and try again!");
                 DisplayContinuePrompt();
             }
             
-            if (myFinch.connect())
+            if (myFinch.connect()) // If connection is successful:
             {
+                // "Powering up" effect:
+                for (int i = 0; i < 255; i++)
+                {
+                    myFinch.setLED(i, 0, 0);
+                }
+
                 Console.WriteLine();
                 Console.WriteLine("You are now connected!");
                 DisplayContinuePrompt();
@@ -130,6 +145,7 @@ namespace Captstone_Project
             }
         }
 
+        /* MotorSettings: Unfinished Component. Needs more time for testing. 
         /// <summary>
         /// Sets motor behavior for the Finch.
         /// </summary>
@@ -171,6 +187,7 @@ namespace Captstone_Project
             myFinch.setMotors(myFinchOperator.MotorSpeed, myFinchOperator.MotorSpeed);
 
         }
+        */
 
         /// <summary>
         /// Turns the Finch's light on to indicate it is immune to damage (the light saber is active) and turns it off while vulnerable (saber is off).
@@ -519,7 +536,7 @@ namespace Captstone_Project
         }
 
         /// <summary>
-        /// Plays the first few notes of Imperial March on the Finch. WARNING: LONG CODE BLOCK
+        /// Plays the first few notes of Imperial March on the Finch. WARNING: LONG CODE BLOCK!
         /// </summary>
         /// <param name="myFinch"></param>
         public static void PlayImpMarchShort(Finch myFinch)
@@ -573,6 +590,120 @@ namespace Captstone_Project
             myFinch.wait(10);
         }
 
+        /// <summary>
+        /// Plays the last few notes of Imperial March. WARNING: LONG CODE BLOCK!
+        /// </summary>
+        /// <param name="myFinch"></param>
+        public static void PlayGameOverMarch(Finch myFinch)
+        {
+
+            myFinch.noteOn(880);
+            myFinch.wait(500);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(440);
+            myFinch.wait(350);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(440);
+            myFinch.wait(150);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(880);
+            myFinch.wait(500);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(830);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(784);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(740);
+            myFinch.wait(125);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(698);
+            myFinch.wait(125);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(740);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(250);
+
+            myFinch.noteOn(455);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(622);
+            myFinch.wait(500);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(587);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(554);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(523);
+            myFinch.wait(125);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(466);
+            myFinch.wait(125);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+
+
+            myFinch.noteOn(523);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(250);
+
+            myFinch.noteOn(349);
+            myFinch.wait(250);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(415);
+            myFinch.wait(500);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(349);
+            myFinch.wait(375);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(261);
+            myFinch.wait(125);
+            myFinch.noteOff();
+            myFinch.wait(10);
+
+            myFinch.noteOn(475);
+            myFinch.wait(1000);
+            myFinch.noteOff();
+            myFinch.wait(100);
+        }
         #endregion
 
         #region HELPER METHODS:

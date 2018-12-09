@@ -75,11 +75,7 @@ namespace Captstone_Project
                 {
                     isHit = true;
                 }
-                else
-                {
-                    isHit = false;
-                }
-
+               
                // myFinch.wait(1000);
             
             return isHit;
