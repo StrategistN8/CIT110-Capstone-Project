@@ -434,12 +434,13 @@ namespace Captstone_Project
             Monitor saberHit = new Monitor();
             bool runApp = true;
             PlayerScoreTracker playerScore = new PlayerScoreTracker();
+            playerScore.PlayerName = userName;
 
             switch (menuChoice.ToUpper())
             {
                 case "1":
                     DisplayGameInProgress(myFinch, myFinchOperator);
-                    playerScore = CurrentPlayerScore(userName, myFinchOperator);
+                    playerScore = CurrentPlayerScore(userName, playerScore, myFinchOperator);
                     DisplayGameOver(playerScore, myFinch);
                     break;
                 case "2":
@@ -666,13 +667,13 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="currentScore"></param>
         /// <returns></returns>
-        static PlayerScoreTracker CurrentPlayerScore(string userName, FinchOperator myFinchOperator)
+        static PlayerScoreTracker CurrentPlayerScore(string userName, PlayerScoreTracker playerScore, FinchOperator myFinchOperator)
         {
-            PlayerScoreTracker tempScore = new PlayerScoreTracker();
-            tempScore.PlayerScore = myFinchOperator.HitsSuffered * myFinchOperator.ScoreModifier;
-            tempScore.PlayerName = userName;
+            
+            playerScore.PlayerScore = myFinchOperator.HitsSuffered * myFinchOperator.ScoreModifier;
+            playerScore.PlayerName = userName;
 
-            return tempScore;
+            return playerScore;
         }
         #endregion
 
