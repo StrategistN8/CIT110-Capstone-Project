@@ -44,7 +44,7 @@ namespace Captstone_Project
             Console.Clear();
 
             // Connecting to Finch to make debugging easier:
-           // myFinch.connect();
+            // myFinch.connect();
 
             // Welcome Screen:
             userName = DisplayWelcomeScreen();
@@ -89,7 +89,7 @@ namespace Captstone_Project
 
             return userName;
         }
-              
+
         /// <summary>
         /// Screen that runs the gameplay:
         /// </summary>
@@ -104,10 +104,14 @@ namespace Captstone_Project
 
             //Variables:
             myFinchOperator.isDefeated = false;
+            
+            // Resets Finch Operator to default hitpoints.
+            myFinchOperator.HitsSuffered = 0;
+            
 
             DisplayHeader("DARTH FINCH");
             Console.WriteLine();
-            
+
             Console.WriteLine("\t\tInitializing...");
 
             // Just in case the user attempts to run the game without a Finch - it doesn't crash, but it doesn't make sense either.
@@ -125,24 +129,26 @@ namespace Captstone_Project
             // Main Gameplay Loop:
             while (!myFinchOperator.isDefeated && timeInLoop <= myFinchOperator.TimeAvailable)
             {
-                hitTracker.IsFrozen = Monitor.FreezeDetection(myFinch);
-                hitTracker.IsHit = Monitor.HitDetection(myFinch);
-
                 DisplayHeader("DARTH FINCH:");
 
                 Console.WriteLine("\tDarth Finch is active!");
-                Console.WriteLine($" Time Remaining: [{myFinchOperator.TimeAvailable - timeInLoop}]");
+                Console.WriteLine("\tTime Remaining:" + $"[{myFinchOperator.TimeAvailable - timeInLoop}]");
                 DisplayHealthStatus(myFinchOperator);
 
-                DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
+                //hitTracker.IsFrozen = Monitor.FreezeDetection(myFinch);
+                //hitTracker.IsHit = Monitor.HitDetection(myFinch);
 
+                DisplayVulnerbilityStatus(myFinch, hitTracker, myFinchOperator);
+                myFinch.wait(500);
+              
                 myFinchOperator.isDefeated = CheckHealth(myFinchOperator);
 
-                //FinchOperator.LEDSettings(myFinch, myFinchOperator);
-                // FinchOperator.MotorSettings(myFinch, myFinchOperator);
-                myFinch.wait(1000);
+                FinchOperator.LEDSettings(myFinch, myFinchOperator);
+                // FinchOperator.MotorSettings(myFinch, myFinchOperator); Disabling this for the time being.
+                myFinch.wait(500);
                 timeInLoop++;
             }
+
 
 
         }
@@ -177,7 +183,7 @@ namespace Captstone_Project
         static void DisplayClosingScreen(string closingText, Finch myFinch)
         {
             Console.Clear();
-            Console.WriteLine("***************[Goodbye!]*****************");
+            Console.WriteLine("\t***************[Goodbye!]*****************");
             Console.WriteLine();
             Console.WriteLine("\tThank you, {0}, for using this application!", closingText);
             Console.WriteLine();
@@ -190,19 +196,44 @@ namespace Captstone_Project
         /// <summary>
         /// Saves the players score to a file:
         /// </summary>
-        /// <param name="playerScore"></param>
-        static void DisplaySavePlayerScoreToFile(PlayerScoreTracker playerScore)
+        /// <param name="currentScore"></param>
+        static void DisplaySavePlayerScoreToFile(PlayerScoreTracker currentScore)
         {
-            string dataPath = @"Data\Scores.txt";
-            List<string> playerScoreList = new List<string>();
-            string playerScoreToSave = "\n" + playerScore.PlayerName + ", " + playerScore.PlayerScore.ToString();
+           
+            // Adds the player's score to a list and then adds it to the file.
+            try
+            {
+                // Varables:
+                string dataPath = @"Data\Scores.txt";
+                List<string> playerScoreList = new List<string>();
+                string playerScoreToSave = "\n" + currentScore.PlayerName + ", " + currentScore.PlayerScore.ToString();
+                playerScoreList.Add(playerScoreToSave);
+                File.AppendAllLines(dataPath, playerScoreList);
 
-            playerScoreList.Add(playerScoreToSave);
+                // Message for user.
+                DisplayHeader("Save Scores");
+                Console.WriteLine();
+                Console.WriteLine("\tScore have been successfully saved.");
+            }
+            catch (FileNotFoundException)
+            {
+                DisplayHeader("ERROR");
+                Console.WriteLine("\tUnable find the file containing scores. The file may have been deleted or corrupted.");
+                Console.WriteLine();
+            }
+            catch (NullReferenceException)
+            {
+                DisplayHeader("ERROR");
+                Console.WriteLine("\tUnable to save scores. No scores were found.");
+                Console.WriteLine();
+            }
+            catch (Exception e)
+            {
+                DisplayHeader("ERROR");
+                Console.WriteLine("\tAn error has occured. Please see the following for more information");
+                Console.WriteLine("[{0}]", e);
+            }
 
-            File.AppendAllLines(dataPath, playerScoreList);
-
-            Console.WriteLine();
-            Console.WriteLine("\tScore Saved.");
             DisplayContinuePrompt();
 
         }
@@ -226,7 +257,7 @@ namespace Captstone_Project
                 //File.WriteAllLines(dataPath, scoreList);
 
                 string[] myArray = File.ReadAllLines(dataPath);
-                
+
                 DisplaySpacer();
                 foreach (string score in myArray)
                 {
@@ -254,10 +285,10 @@ namespace Captstone_Project
             {
                 DisplayHeader("ERROR");
                 Console.WriteLine("\tAn error has occured. Please see the following for more information");
-                Console.WriteLine("[{0}]",e);
+                Console.WriteLine("[{0}]", e);
             }
         }
-     
+
         /// <summary>
         /// Game Over Screen:
         /// </summary>
@@ -266,15 +297,17 @@ namespace Captstone_Project
         {
             DisplayHeader("GAME OVER");
 
+            // Displays the player's score.
             DisplayPlayerScore(currentScore);
 
+            // Bit of a musical blurb for the user.
             FinchOperator.PlayGameOverMarch(myFinch);
 
             DisplayContinuePrompt();
 
 
         }
-        
+
         #endregion
 
         #region MENU SCREENS: 
@@ -314,7 +347,7 @@ namespace Captstone_Project
 
             return runApp;
         }
-    
+
         /// <summary>
         /// Setup menu: Allows the user to access Finch connection and difficulty settings.
         /// </summary>
@@ -388,7 +421,7 @@ namespace Captstone_Project
 
             return returnToPrevious;
         }
-       
+
         /// <summary>
         /// Processes menu selection for DisplayMainMenu.
         /// </summary>
@@ -399,17 +432,14 @@ namespace Captstone_Project
         {
             //Local Variables:
             Monitor saberHit = new Monitor();
-            PlayerScoreTracker playerScore = new PlayerScoreTracker();
-            playerScore.PlayerName = userName;
-           
-
             bool runApp = true;
+            PlayerScoreTracker playerScore = new PlayerScoreTracker();
 
             switch (menuChoice.ToUpper())
             {
                 case "1":
                     DisplayGameInProgress(myFinch, myFinchOperator);
-                    CurrentPlayerScore(userName, playerScore, myFinchOperator);
+                    playerScore = CurrentPlayerScore(userName, myFinchOperator);
                     DisplayGameOver(playerScore, myFinch);
                     break;
                 case "2":
@@ -425,17 +455,15 @@ namespace Captstone_Project
                     DisplayReadScoreFromFile();
                     break;
                 case "6":
-                    DisplayHeader("DARTH FINCH");
-                    Console.WriteLine("\tDarth Finch is amused by your request, but is willing to humor you.");
-                    Console.WriteLine("\t(Please allow the Finch to finish, you will see a continue prompt when it is done)");
                     FinchOperator.PlayImpMarch(myFinch);
+                    DisplayHeader("END OF SONG");
                     DisplayContinuePrompt();
                     break;
                 case "E":
                     runApp = false;
                     break;
                 default:
-                    Console.WriteLine("'{0}' is not a valid input. Please try again!", menuChoice);
+                    Console.WriteLine("\t'{0}' is not a valid input. Please try again!", menuChoice);
                     DisplayContinuePrompt();
                     Console.Clear();
                     break;
@@ -458,27 +486,28 @@ namespace Captstone_Project
             Difficulty difficulty;
 
             DisplayHeader("DARTH FINCH: SELECT DIFFICULTY");
+            Console.WriteLine();
             foreach (var setting in Enum.GetValues(typeof(Difficulty)))
             {
                 Console.WriteLine("\t" + setting);
             }
 
             Console.WriteLine();
-            Console.WriteLine("\tSelect Difficulty -> ");
+            Console.Write("\tSelect Difficulty -> ");
             while (!Enum.TryParse(Console.ReadLine().ToUpper(), out difficulty))
             {
-                Console.WriteLine("That is not a valid difficulty level. Please try again!");
+                Console.WriteLine("\tThat is not a valid difficulty level. Please try again!");
                 DisplayContinuePrompt();
             }
 
 
             myFinchOperator.DifficultySetting = difficulty;
             Console.WriteLine();
-            Console.WriteLine($" You selected {myFinchOperator.DifficultySetting}");
+            Console.WriteLine("\tYou selected " + $"{myFinchOperator.DifficultySetting}");
             DisplayContinuePrompt();
 
         }
-       
+
         /// <summary>
         /// Takes the difficulty selected by the player and assigns values for use in other Finch operations based on that difficulty.
         /// </summary>
@@ -523,11 +552,15 @@ namespace Captstone_Project
         /// </summary>
         static void DisplayVulnerbilityStatus(Finch myFinch, Monitor hitTracker, FinchOperator myFinchOperator)
         {
+            // Checks for hits upon entering the method:
+            hitTracker.IsHit = Monitor.HitDetection(myFinch);
+            hitTracker.IsFrozen = Monitor.FreezeDetection(myFinch);
+            
             // Statment to indicate a hit while shields are up.
             if (hitTracker.IsHit == true && hitTracker.IsFrozen == false)
             {
                 Console.WriteLine();
-                Console.WriteLine("The blast is deflected!");
+                Console.WriteLine("\tThe blast is deflected! You need to freeze him first.");
                 FinchOperator.LEDSettings(myFinch, myFinchOperator);
                 myFinch.wait(1000);
             }
@@ -536,11 +569,11 @@ namespace Captstone_Project
             if (hitTracker.IsFrozen == true)
             {
                 Console.WriteLine();
-                Console.WriteLine("That got him! Strike now while he is stunned!");
+                Console.WriteLine("\tThat got him! Strike now while he is stunned!");
 
                 // Sets the finch to vulnerable so it can take hits:
                 myFinchOperator.IsVulnerable = true;
-                
+
                 // Turns off the LED to indicate shields are down.
                 FinchOperator.LEDSettings(myFinch, myFinchOperator);
 
@@ -558,37 +591,39 @@ namespace Captstone_Project
         /// <param name="myFinchOperator"></param>
         static void ShieldsDown(Finch myFinch, Monitor hitTracker, FinchOperator myFinchOperator)
         {
-            hitTracker.IsHit = Monitor.HitDetection(myFinch);
             myFinch.wait(myFinchOperator.vulnerabilityDuration);
-
+            hitTracker.IsHit = Monitor.HitDetection(myFinch);
+           
             if (hitTracker.IsHit == true)
             {
-                Console.WriteLine("Nice hit! He'll feel that for sure.");
+                Console.WriteLine();
+                Console.WriteLine("\tNice hit! He'll feel that for sure.");
                 myFinchOperator.HitsSuffered += 1;
                 myFinch.wait(500);
             }
 
             else
             {
-                Console.WriteLine("The moment to strike has passed. Try again!");
-
+                Console.WriteLine();
+                Console.WriteLine("\tThe moment to strike has passed. Try again!");
+                myFinch.wait(500);
             }
             myFinchOperator.IsVulnerable = false;
-            myFinch.wait(500);
+            
             FinchOperator.LEDSettings(myFinch, myFinchOperator);
 
 
         }
-        
+
         /// <summary>
         /// Displays current health and how many hits have been sustained.
         /// </summary>
         /// <param name="myFinchOperator"></param>
         static void DisplayHealthStatus(FinchOperator myFinchOperator)
         {
-          
+
             Console.Write("\tCurrent Hitpoints: " + $"{myFinchOperator.HitPoints - myFinchOperator.HitsSuffered}");
-            
+
         }
 
         /// <summary>
@@ -605,7 +640,7 @@ namespace Captstone_Project
                 isDefeated = true;
 
                 Console.WriteLine("\tDarth Finch has been defeated!");
-                
+
             }
 
             return isDefeated;
@@ -614,7 +649,7 @@ namespace Captstone_Project
         #endregion
 
         #region SCORING METHODS:
-        
+
         /// <summary>
         /// Display the player's score:
         /// </summary>
@@ -622,7 +657,7 @@ namespace Captstone_Project
         /// <param name="myFinchOperator"></param>
         static void DisplayPlayerScore(PlayerScoreTracker currentScore)
         {
-            Console.WriteLine("\t{0} scored {1}", currentScore.PlayerName, currentScore.PlayerScore);      
+            Console.WriteLine("\t{0} scored {1}", currentScore.PlayerName, currentScore.PlayerScore, " points");
         }
 
 
@@ -631,12 +666,13 @@ namespace Captstone_Project
         /// </summary>
         /// <param name="currentScore"></param>
         /// <returns></returns>
-        static PlayerScoreTracker CurrentPlayerScore(string userName, PlayerScoreTracker currentScore, FinchOperator myFinchOperator)
+        static PlayerScoreTracker CurrentPlayerScore(string userName, FinchOperator myFinchOperator)
         {
-            currentScore.PlayerScore = myFinchOperator.HitsSuffered * myFinchOperator.ScoreModifier;
-            currentScore.PlayerName = userName;
+            PlayerScoreTracker tempScore = new PlayerScoreTracker();
+            tempScore.PlayerScore = myFinchOperator.HitsSuffered * myFinchOperator.ScoreModifier;
+            tempScore.PlayerName = userName;
 
-            return currentScore;
+            return tempScore;
         }
         #endregion
 

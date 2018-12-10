@@ -25,15 +25,7 @@ namespace Captstone_Project
         private int _scoreModifier;
         private Difficulty _difficultySetting;
         private int _timeAvailable;
-
-       
-
-
-
-
-
-
-        #endregion
+    #endregion
 
         #region PROPERTIES:
         public bool IsFrozen
@@ -116,9 +108,8 @@ namespace Captstone_Project
         /// <param name="myFinch"></param>
         public static void EstablishFinchConnection(Finch myFinch)
         {
-            //Variables: 
-
-            Console.WriteLine("Please plug your finch into the computer. Then, press any key to continue.");
+            Console.WriteLine();
+            Console.WriteLine("\tPlease plug your finch into the computer. Then, press any key to continue.");
             Console.ReadKey();
 
             //Attempts to Connect to the Finch Robot:
@@ -126,7 +117,7 @@ namespace Captstone_Project
          
             if (!myFinch.connect()) // If connection fails:
             {
-                Console.WriteLine("Unable to connect to the finch. Please check your cable connection and try again!");
+                Console.WriteLine("\tUnable to connect to the finch. Please check your cable connection and try again!");
                 DisplayContinuePrompt();
             }
             
@@ -137,9 +128,9 @@ namespace Captstone_Project
                 {
                     myFinch.setLED(i, 0, 0);
                 }
-
+                PlayImpMarchShort(myFinch);
                 Console.WriteLine();
-                Console.WriteLine("You are now connected!");
+                Console.WriteLine("\tYou are now connected!");
                 DisplayContinuePrompt();
                 Console.Clear();
             }
@@ -213,6 +204,19 @@ namespace Captstone_Project
         /// <param name="myFinch"></param>
         public static void PlayImpMarch(Finch myFinch)
         {
+            // Just in case the user attempts to run the game without a Finch - it doesn't crash, but it doesn't make sense either.
+            if (!myFinch.connect())
+            {
+                DisplayHeader("DARTH FINCH");
+                Console.WriteLine("\tNo finch detected. Please connect a Finch before proceeding!");
+                DisplayContinuePrompt();
+                FinchOperator.EstablishFinchConnection(myFinch);
+            }
+
+            DisplayHeader("DARTH FINCH");
+            Console.WriteLine("\tDarth Finch is amused by your request, but is willing to humor you.");
+            Console.WriteLine("\t(Please allow the Finch to finish, you will see a continue prompt when it is done)");
+
             // Source for notes: http://llrprt.blogspot.com/2013/11/programming-imperial-march.htmlhttp://llrprt.blogspot.com/2013/11/programming-imperial-march.html
 
             myFinch.wait(1000);
@@ -376,7 +380,7 @@ namespace Captstone_Project
             myFinch.noteOff();
             myFinch.wait(10);
 
-            myFinch.noteOn(466);
+            myFinch.noteOn(466);  // I wasn't kidding when I said this was long.
             myFinch.wait(125);
             myFinch.noteOff();
             myFinch.wait(10);
@@ -596,89 +600,7 @@ namespace Captstone_Project
         /// <param name="myFinch"></param>
         public static void PlayGameOverMarch(Finch myFinch)
         {
-
-            myFinch.noteOn(880);
-            myFinch.wait(500);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(440);
-            myFinch.wait(350);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(440);
-            myFinch.wait(150);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(880);
-            myFinch.wait(500);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(830);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(784);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(740);
-            myFinch.wait(125);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(698);
-            myFinch.wait(125);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(740);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(250);
-
-            myFinch.noteOn(455);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(622);
-            myFinch.wait(500);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(587);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(554);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(523);
-            myFinch.wait(125);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-            myFinch.noteOn(466);
-            myFinch.wait(125);
-            myFinch.noteOff();
-            myFinch.wait(10);
-
-
-
-            myFinch.noteOn(523);
-            myFinch.wait(250);
-            myFinch.noteOff();
-            myFinch.wait(250);
-
+            // Just the last five notes:
             myFinch.noteOn(349);
             myFinch.wait(250);
             myFinch.noteOff();

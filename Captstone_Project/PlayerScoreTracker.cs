@@ -35,7 +35,7 @@ namespace Captstone_Project
         #endregion
 
         #region METHODS
-
+        // Might move some of the score processing methods over here in later refactoring.
         #endregion
     }
 }

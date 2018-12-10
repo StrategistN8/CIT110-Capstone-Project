@@ -64,19 +64,18 @@ namespace Captstone_Project
             double ambientLight = GetLightAverage(myFinch);
             double threshold = 1;
             double maxLightThreshold = ambientLight + threshold;
-            int currentLight = GetLightAverage(myFinch);
+
+            myFinch.wait(1000);
 
             bool isHit = false;
+                   
+            int currentLight = GetLightAverage(myFinch);
 
-            currentLight = GetLightAverage(myFinch);
-
-
+            
             if (currentLight > maxLightThreshold)
             {
                 isHit = true;
             }
-
-            // myFinch.wait(1000);
 
             return isHit;
         }
@@ -108,10 +107,12 @@ namespace Captstone_Project
             const double threshold = 1.1;
 
             double minTemperatureThreshold = ambientTemperature - threshold;
+            myFinch.wait(1000);
             double currentTemperature = myFinch.getTemperature();
 
             bool isHit = false;
 
+            // Ideally this should allow the Finch sensor to trigger a hit.
             currentTemperature = myFinch.getTemperature();
 
             if (currentTemperature <= minTemperatureThreshold)
